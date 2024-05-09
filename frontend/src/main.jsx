@@ -11,6 +11,8 @@ import {
 
 import App from './App.jsx'
 import HomePage from './pages/HomePage.jsx';
+import AddItemFormPage from './pages/AddItemFormPage.jsx';
+import ItemsPage from './pages/ItemsPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +23,14 @@ const router = createBrowserRouter([
         path: "/",
         element: <HomePage />,
         index: true
+      },
+      {
+        path: "/items",
+        element: <ItemsPage />
+      },
+      {
+        path: "/addItem",
+        element: <AddItemFormPage />
       }
     ]
   }
@@ -31,7 +41,7 @@ const theme = createTheme({
       main: "#fb8c00"
     },
     secondary: {
-      main: "#ffe082"
+      main: "#f5bb47"
     }
   }
 })
