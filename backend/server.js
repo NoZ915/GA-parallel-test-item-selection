@@ -1,10 +1,12 @@
 import "dotenv/config";
+import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import itemsRoutes from "./routes/items.js";
 
 // express app
 const app = express();
+app.use(cors());
 
 // middleware
 app.use((req, res, next) => {

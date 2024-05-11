@@ -8,6 +8,10 @@ body {
     height: 100%;
 }
 
-body{
+body {
     background-color: #fb8c00;
+}
+
+#root {
+    height: 100%;
 }
