@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
+import axios from "axios";
 
 import { Container, MenuItem, TextField, Typography, Box, Button } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -57,8 +57,7 @@ function AddItemFormPage() {
     const [format, setFormat] = useState("fillIn");
     const [type, setType] = useState("limit");
     const [examPaper, setExamPaper] = useState("ntuB");
-    const [difficulty, setDifficulty] = useState(1);
-    const [fileName, setFileName] = useState("請上傳題目圖片")
+    const [fileName, setFileName] = useState("請上傳題目圖片");
 
     const handelUploadChange = (e) => {
         setFile(e.target.files[0]);
@@ -72,57 +71,19 @@ function AddItemFormPage() {
         formData.append("format", format);
         formData.append("type", type);
         formData.append("examPaper", examPaper);
-        if (examPaper === "ntuB") {
-            setDifficulty(5);
-            formData.append("difficulty", difficulty);
-        } else if (examPaper === "uts" && year === "105") {
-            setDifficulty(4);
-            formData.append("difficulty", difficulty);
-        } else if (examPaper === "uts" || examPaper === "tcusA") {
-            setDifficulty(3);
-            formData.append("difficulty", difficulty);
-        } else if (examPaper === "ntuC") {
-            setDifficulty(2);
-            formData.append("difficulty", difficulty);
-        } else if (examPaper === "nutn") {
-            setDifficulty(1);
-            formData.append("difficulty", difficulty);
-        }
 
-        const response = await fetch("http://localhost:4000/api/items", {
-            method: "POST",
-            body: JSON.stringify(formData),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        const json = await response.json();
-        if (response.ok) {
-            console.log(json);
-            setFile("");
-            setYear("111");
-            setFormat("fillIn");
-            setType("limit");
-            setExamPaper("ntuA");
-            setDifficulty(1);
-            navigate("/items");
-        }
-
-        // axios.post("http://localhost:4000/api/items", formData)
-        //     .then(res => {
-        //         console.log(res.data);
-        //         setFile("");
-        //         setYear("111");
-        //         setFormat("fillIn");
-        //         setType("limit");
-        //         setExamPaper("ntuA");
-        //         setDifficulty(1);
-        //         navigate("/items");
-        //     })
-        //     .catch((err) => {
-        //         console.log("hiii")
-        //         console.log(err);
-        //     })
+        axios.post("http://localhost:4000/api/items", formData)
+            .then(res => {
+                setFile("");
+                setYear("111");
+                setFormat("fillIn");
+                setType("limit");
+                setExamPaper("ntuA");
+                navigate("/items");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
     }
 
     return (

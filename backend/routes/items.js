@@ -10,8 +10,9 @@ import { error } from "console";
 const router = express.Router();
 
 // GET all items
-router.get("/", (req, res) => {
-    res.json({ mssg: "GET all items" })
+router.get("/", async (req, res) => {
+    const items = await Item.find({}).sort({ createdAt: -1 });
+    res.status(200).json(items)
 })
 
 //GET a single item
@@ -21,10 +22,10 @@ router.get("/:id", (req, res) => {
 
 //POST a new item
 const storage = multer.diskStorage({
-    destination(req, file, cb){
-        cb(null, "./public/itemImage"); //null is for error
+    destination(req, file, cb) {
+        cb(null, "./uploads"); //null is for error
     },
-    filename(req, file, cb){
+    filename(req, file, cb) {
         cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
     }
 });
@@ -35,18 +36,29 @@ const upload = multer({
 router.post("/", upload.single("image"), async (req, res) => {
     // req.file 為圖片
     // req.body 為其他資料
-    const content = req.file.path;
-    const { year, format, type, examPaper, difficulty } = req.body;
+    const content = req.file.filename;
+    const { year, format, type, examPaper } = req.body;
+    let difficulty = 1;
 
-    try{
-        console.log({ content, year, format, type, examPaper, difficulty})
-        const item = await Item.create({ content, year, format, type, examPaper, difficulty});
-        console.log("hiii")
+    if (examPaper === "ntuB") {
+        difficulty = 5;
+    } else if (examPaper === "uts" && year === "105") {
+        console.log("I'm here!");
+        difficulty = 4;
+    } else if (examPaper === "uts" || examPaper === "tcusA") {
+        difficulty = 3;
+    } else if (examPaper === "ntuC") {
+        difficulty = 2;
+    } else if (examPaper === "nutn") {
+        difficulty = 1;
+    }
+
+    try {
+        const item = await Item.create({ content, year, format, type, examPaper, difficulty });
         res.status(200).json(item)
-    }catch(err){
+    } catch (err) {
         res.status(400).json({ error: error.message });
     }
-    // console.log(req)
 });
 
 //DELETE an item

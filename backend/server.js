@@ -1,3 +1,4 @@
+import path from "path";
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
@@ -17,6 +18,9 @@ app.use((req, res, next) => {
 // routes
 app.use(express.json());
 app.use("/api/items", itemsRoutes);
+
+const __dirname = path.resolve(); //set __dirname to current directory
+app.use(express.static(path.join(__dirname, "./uploads")));
 
 //connect to db
 mongoose.connect(process.env.MONGO_URI)

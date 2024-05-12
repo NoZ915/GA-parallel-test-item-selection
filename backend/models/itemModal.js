@@ -21,10 +21,10 @@ const ItemSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    dufficulty: {
+    difficulty: {
         type: Number,
         required: true
-    } 
+    }
 }, { timestamps: true });
 
 const Item = mongoose.model("Item", ItemSchema);
