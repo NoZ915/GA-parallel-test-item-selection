@@ -43,7 +43,6 @@ router.post("/", upload.single("image"), async (req, res) => {
     if (examPaper === "ntuB") {
         difficulty = 5;
     } else if (examPaper === "uts" && year === "105") {
-        console.log("I'm here!");
         difficulty = 4;
     } else if (examPaper === "uts" || examPaper === "tcusA") {
         difficulty = 3;
