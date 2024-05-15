@@ -17,7 +17,7 @@ const containerStyle = {
 const outerStyle = {
     position: "relative",
     overflow: "hidden",
-    backgroundColor: "rgba(213,214,215,1)",
+    backgroundColor: "rgb(238, 238, 238)",
 }
 const innerStyle = {
     position: "absolute",
@@ -33,7 +33,7 @@ const innerStyle = {
 
     inset: "0",
     "--transform-translate-x": "-100%",
-    background: "linear-gradient(90deg, rgba(213,214,215,1) 0%, rgba(255,255,255,1) 50%, rgba(213,214,215,1) 100%)",
+    background: "linear-gradient(90deg, rgb(238, 238, 238) 0%, rgba(255,255,255,1) 50%, rgb(238, 238, 238) 100%)",
 }
 
 function Skeleton({ times }) {
