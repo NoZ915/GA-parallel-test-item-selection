@@ -1,15 +1,15 @@
-import Item from "../models/itemModal";
+import Item from "../models/itemModal.js";
 
 // 目標函式
-function objective_function(items){
+function objective_function(items) {
 
 }
 // 限制函式
-function constraint1(items){
+function constraint1(items) {
 
 }
-function constraint2(items){
-    
+function constraint2(items) {
+
 }
 
 const generateExam = async (req, res) => {
