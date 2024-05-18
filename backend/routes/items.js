@@ -1,9 +1,6 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import {
-    createItem
-} from "../controllers/itemController.js";
 import Item from "../models/itemModal.js";
 import { error } from "console";
 

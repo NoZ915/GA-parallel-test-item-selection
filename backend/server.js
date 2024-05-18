@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
 import itemsRoutes from "./routes/items.js";
+import examsRoutes from "./routes/exams.js";
 
 // express app
 const app = express();
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
 // routes
 app.use(express.json());
 app.use("/api/items", itemsRoutes);
+app.use("/api/exams", examsRoutes);
 
 const __dirname = path.resolve(); //set __dirname to current directory
 app.use(express.static(path.join(__dirname, "./uploads")));

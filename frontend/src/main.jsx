@@ -15,6 +15,7 @@ import App from './App.jsx'
 import HomePage from './pages/HomePage.jsx';
 import AddItemFormPage from './pages/AddItemFormPage.jsx';
 import ItemsPage from './pages/ItemsPage.jsx';
+import ExamsPage from './pages/ExamsPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/addItem",
         element: <AddItemFormPage />
+      },
+      {
+        path: "/exams",
+        element: <ExamsPage />
       }
     ]
   }
@@ -58,6 +63,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <RouterProvider router={router} />
       </ThemeProvider>
     </QueryClientProvider>
-
   </React.StrictMode>,
 )

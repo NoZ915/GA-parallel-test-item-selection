@@ -24,7 +24,7 @@ const containerStyle = {
 }
 
 function ItemsPage() {
-    const { data, error, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    const { data, status, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
         queryKey: ["items"],
         queryFn: fetchItems,
         initialPageParam: 0,
