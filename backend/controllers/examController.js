@@ -8,35 +8,35 @@ const a = 1.7
 
 // b_i: 第i題的難度
 // b: 為每一題難度的陣列
-function generateB(items){
+function generateB(items) {
     let b = [];
-    for(let i = 0; i < items.length; i++){
+    for (let i = 0; i < items.length; i++) {
         b.push(items[i].difficulty);
     }
     return b;
 }
 
 // P_i(θ_j): 能力為θ_j的受試者答對第i題的機率
-function P_i(theta_j, b_i){
+function P_i(theta_j, b_i) {
     return 1 / (1 + Math.exp(-a * (theta_j - b_i)));
 }
 
 // Q_i(θ_j): 能力為θ_j的受試者答錯第i題的機率
-function Q_i(P_i){
+function Q_i(P_i) {
     return 1 - P_i;
 }
 
 // I_i(θ_j): 第i題題目的訊息量
-function I_i(theta_j, b_i){
+function I_i(theta_j, b_i) {
     const P = P_i(theta_j, b_i);
     const Q = Q_i(P);
     return (a ** 2) * P * Q;
 }
 
 // O_j: 所有選中的題目的訊息量總和
-function O_j(theta_j, b, items, X_i){
+function O_j(theta_j, b, items, X_i) {
     let sum = 0;
-    for(let i = 0; i < items.length; i++){
+    for (let i = 0; i < items.length; i++) {
         sum += I_i(theta_j, b[i]) * X_i[i];
     }
     return sum;
@@ -45,7 +45,7 @@ function O_j(theta_j, b, items, X_i){
 // 目標函式
 function objective_function(items, X_i, theta, b, d) {
     let sum = 0;
-    for(let j = 0; j < d.length; j++){
+    for (let j = 0; j < d.length; j++) {
         const O = O_j(theta[j], b, items, X_i);
         sum += ((d[j] - O) ** 2);
     }
@@ -53,21 +53,48 @@ function objective_function(items, X_i, theta, b, d) {
 }
 
 // 限制函式
-// 限制函式1: 題目形式填充題>10、計算題>5
+// 限制函式1: 題目形式填充題>=10、計算題>=5，回傳true/false
 function constraint1(items, X_i) {
-
+    const calculationFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.format === "calculation"
+    )
+    const fillInFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.format === "fillIn"
+    )
+    return calculationFilterArr.length >= 5 && fillInFilterArr.length >= 10;
 }
-function constraint2(items) {
-
+// 限制函式2: 題型有五類，每一類都>=3，回傳true/false
+function constraint2(items, X_i) {
+    const limitFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.type === "limit"
+    )
+    const differentiationFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.type === "differentiation"
+    )
+    const integrationFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.type === "integration"
+    )
+    const seriesFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.type === "series"
+    )
+    const vectorFilterArr = items.filter((item, index) =>
+        X_i[index] === 1 && item.type === "vector"
+    )
+    return limitFilterArr >= 3
+        && differentiationFilterArr >= 3
+        && integrationFilterArr >= 3
+        && seriesFilterArr >= 3
+        && vectorFilterArr >= 3;
 }
-function constraint3(items) {
-
+// 限制函式3: 測驗的題目數量=20題
+function constraint3(X_i) {
+    return X_i.filter(x => x === 1).length === 20;
 }
 
 const generateExam = async (req, res) => {
     const items = await Item.find({}).sort({ createdAt: -1 });
     const X_i = Array.from(
-        { length: items.length }, 
+        { length: items.length },
         () => Math.round(Math.random())
     )
     const b = generateB(items);
