@@ -83,11 +83,11 @@ function constraint2(items, X_i) {
     const vectorFilterArr = items.filter((item, index) =>
         X_i[index] === 1 && item.type === "vector"
     )
-    return limitFilterArr >= 3
-        && differentiationFilterArr >= 3
-        && integrationFilterArr >= 3
-        && seriesFilterArr >= 3
-        && vectorFilterArr >= 3;
+    return limitFilterArr.length >= 3
+        && differentiationFilterArr.length >= 3
+        && integrationFilterArr.length >= 3
+        && seriesFilterArr.length >= 3
+        && vectorFilterArr.length >= 3;
 }
 // 限制函式3: 測驗的題目數量=20題
 function constraint3(X_i) {
@@ -96,17 +96,6 @@ function constraint3(X_i) {
 
 // ----------基因演算法各函式---------- //
 // Initialization: 初始化族群
-// function initializationPopulation(popSize, chromosomeLength){
-//     const population = [];
-//     for(let i = 0; i < popSize; i++){
-//         const chromosome = Array.from(
-//             { length: chromosomeLength },
-//             () => Math.round(Math.random())
-//         );
-//         population.push(chromosome);
-//     }
-//     return population;
-// }
 function initializationPopulation(populationSize, chromosomeLength, onesCount) {
     let population = [];
     for (let i = 0; i < populationSize; i++) {
@@ -125,10 +114,10 @@ function initializationPopulation(populationSize, chromosomeLength, onesCount) {
 
 // Evalutate: 針對每一個chromosome計算適應度
 // 用來對population每一個chromosome轉換成目標函數值或MAX_VALUE
-function fitnessFunction(items, X_i, theta, b, d){
-    if(!constraint1(items, X_i) || !constraint2(items, X_i) || !constraint3(items, X_i)){
+function fitnessFunction(items, X_i, theta, b, d) {
+    if (!constraint1(items, X_i) || !constraint2(items, X_i) || !constraint3(X_i)) {
         // 只要不符合限制條件的chromosome，都回傳極小值，之後被選擇的機會才能大幅減少
-        return Number.MAX_VALUE;
+        return Number(0);
     }
     // 其餘符合者，就回傳目標函數計算出來的值
     return objective_function(items, X_i, theta, b, d);
@@ -136,16 +125,16 @@ function fitnessFunction(items, X_i, theta, b, d){
 
 // Selection: 利用roulette wheel輪盤法選擇
 // 適應度越大，代表佔適應度總值越大，越有機會被選中
-function select(population, fitnesses){
+function select(population, fitnesses) {
     const totalFitness = fitnesses.reduce((a, b) => a + b, 0); // 總適應度
     const selectionProbs = fitnesses.map(fitness => fitness / totalFitness); //每個染色體選中機率
     const rand = Math.random(); // 上一行機率為0~1之間，故隨機產生一個0~1間的數字
     let sum = 0;
     // 他會開始輪流跑每個染色體，把機率相加，只要一超過隨機的rand值，就是指到我們要的個體（染色體）了
     // 若跑完所有染色體，把機率相加仍無法超過rand值，則直接返回population裡最後一個個體（染色體）
-    for(let i = 0; i < population.length; i++){
+    for (let i = 0; i < population.length; i++) {
         sum += selectionProbs[i];
-        if(rand < sum){
+        if (rand < sum) {
             return population[i];
         }
     }
@@ -153,7 +142,7 @@ function select(population, fitnesses){
 }
 
 //Crossover: 拿select function選出來最優秀的染色體作為父/母，利用單點交配產生子代
-function crossover(parent1, parent2){
+function crossover(parent1, parent2) {
     const crossoverPoint = Math.floor(Math.random() * parent1.length);
     const child1 = parent1.slice(0, crossoverPoint).concat(parent2.slice(crossoverPoint));
     const child2 = parent2.slice(0, crossoverPoint).concat(parent1.slice(crossoverPoint));
@@ -162,9 +151,9 @@ function crossover(parent1, parent2){
 
 // Mutation: 要先給定突變率，paper上提到0.01~0.0001是最適合的突變率
 // 遍歷單個染色體陣列中每個元素，以隨機方式做突變：0->1、1->0
-function mutate(chromosome, mutationRate){
-    for(let i = 0; i < chromosome.length; i++){
-        if(Math.random() < mutationRate){
+function mutate(chromosome, mutationRate) {
+    for (let i = 0; i < chromosome.length; i++) {
+        if (Math.random() < mutationRate) {
             chromosome[i] = 1 - chromosome[i];
         }
     }
@@ -185,22 +174,28 @@ const generateExam = async (req, res) => {
     let population = initializationPopulation(popSize, chromosomeLength, onesCount);
 
     //找第一個最佳解: 以下開始迴圈做演化，每一圈代表演化了一代
-    for(let generation = 0; generation < numGenerations; generation++){
+    for (let generation = 0; generation < numGenerations; generation++) {
         console.log(generation);
         // Evaluate: 計算適應度
         const fitnesses = population.map(individual => fitnessFunction(items, individual, theta, b, d));
-        
+
         // 新的族群
         const newPopulation = [];
-        while(newPopulation.length < popSize){
+        while (newPopulation.length < popSize) {
             // Select: 選擇出適應度可能為最佳的父/母
             const parent1 = select(population, fitnesses);
             const parent2 = select(population, fitnesses);
             // Crossover: 把選出的父母交配產生子代
             const [child1, child2] = crossover(parent1, parent2);
             // Mutation: 做突變
-            newPopulation.push(mutate(child1, mutationRate));
-            newPopulation.push(mutate(child2, mutationRate));
+            const mutateChild1 = mutate(child1, mutationRate);
+            const mutateChild2 = mutate(child2, mutationRate);
+            if (constraint3(mutateChild1)) {
+                newPopulation.push(mutateChild1);
+            }
+            if (constraint3(mutateChild2)) {
+                newPopulation.push(mutateChild2);
+            }
         }
         // 更新族群
         population = newPopulation;
@@ -211,8 +206,8 @@ const generateExam = async (req, res) => {
     const bestIndex1 = fitnesses1.indexOf(Math.min(...fitnesses1));
     const bestSolution1 = population[bestIndex1];
 
-    console.log(bestSolution1.filter(x => x===1).length)
-    console.log(Math.min(...fitnesses1))
+    console.log(bestSolution1.filter(x => x === 1))
+    console.log(Math.min(fitnesses1.filter()))
 
     res.status(200).json(items)
 }
