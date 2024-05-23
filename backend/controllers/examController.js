@@ -51,6 +51,7 @@ function objective_function(items, X_i, theta, b, d) {
     for (let j = 0; j < d.length; j++) {
         const O = O_j(theta[j], b, items, X_i);
         sum += ((d[j] - O) ** 2);
+        console.log(d[j], O)
     }
     return sum;
 }
@@ -113,11 +114,20 @@ function initializationPopulation(populationSize, chromosomeLength, onesCount) {
 }
 
 // Evalutate: 針對每一個chromosome計算適應度
-// 用來對population每一個chromosome轉換成目標函數值或MAX_VALUE
+// 用來對population每一個chromosome轉換成目標函數值或0 輪盤就轉不到他
 function fitnessFunction(items, X_i, theta, b, d) {
     if (!constraint1(items, X_i) || !constraint2(items, X_i) || !constraint3(X_i)) {
         // 只要不符合限制條件的chromosome，都回傳極小值，之後被選擇的機會才能大幅減少
         return Number(0);
+    }
+    // 其餘符合者，就回傳目標函數計算出來的值
+    return objective_function(items, X_i, theta, b, d);
+}
+// 結果要求出最小值 故不合constraint者給無限大
+function feasibleFitnessFunction(items, X_i, theta, b, d) {
+    if (!constraint1(items, X_i) || !constraint2(items, X_i) || !constraint3(X_i)) {
+        // 只要不符合限制條件的chromosome，都回傳極小值，之後被選擇的機會才能大幅減少
+        return Number.MAX_VALUE;
     }
     // 其餘符合者，就回傳目標函數計算出來的值
     return objective_function(items, X_i, theta, b, d);
@@ -202,12 +212,20 @@ const generateExam = async (req, res) => {
     }
 
     // 找到第一個最佳解
-    const fitnesses1 = population.map(individual => fitnessFunction(items, individual, theta, b, d));
+    const fitnesses1 = population.map(individual => feasibleFitnessFunction(items, individual, theta, b, d));
     const bestIndex1 = fitnesses1.indexOf(Math.min(...fitnesses1));
     const bestSolution1 = population[bestIndex1];
 
-    console.log(bestSolution1.filter(x => x === 1))
-    console.log(Math.min(fitnesses1.filter()))
+    console.log(bestSolution1)
+    console.log(population[bestIndex1 % items.length].forEach((p, index) => {
+        if(p === 1){
+            console.log(index)
+            console.log(items[index])
+            // return items[index];
+        }
+    }))
+    console.log(Math.min(...fitnesses1))
+    console.log()
 
     res.status(200).json(items)
 }
