@@ -178,12 +178,14 @@ const generateExam = async (req, res) => {
     const chromosomeLength = items.length;
     const onesCount = 20; // 每個染色體中1的個數
     const b = generateB(items);
-    let parents = [];
+    let parents1 = [];
+    let parents2 = [];
 
-    //Initialize
+    // ----------第一個最佳解---------- //
+    // Initialize
     let population = initializationPopulation(popSize, chromosomeLength, onesCount);
-    let bestSolution = null;
-    let bestFitness = Number.NEGATIVE_INFINITY;
+    let bestSolution1 = null;
+    let bestFitness1 = Number.NEGATIVE_INFINITY;
 
     //找第一個最佳解: 以下開始迴圈做演化，每一圈代表演化了一代
     for (let generation = 0; generation < numGenerations; generation++) {
@@ -201,12 +203,12 @@ const generateExam = async (req, res) => {
             // 只計算那些符合constraint1~3的解
             let feasible_fitness = feasible_population.map(p => objective_function(items, p, theta, b, d));
             let invert_feasible_fitness = invertWeights(feasible_fitness);
-            parents = weightedRandomChoice(feasible_population, invert_feasible_fitness, popSize);
+            parents1 = weightedRandomChoice(feasible_population, invert_feasible_fitness, popSize);
         } else {
-            while (parents.length < popSize) {
+            while (parents1.length < popSize) {
                 let potential_parents = weightedRandomChoice(population, fitness, 1)[0];
                 if (constraint1(items, potential_parents) && constraint2(items, potential_parents) && constraint3(potential_parents)) {
-                    parents.push(potential_parents);
+                    parents1.push(potential_parents);
                 }
             }
         }
@@ -215,8 +217,8 @@ const generateExam = async (req, res) => {
         // Crossover
         let offSpring = [];
         while (offSpring.length < popSize) {
-            let parent1 = randomChoices(parents);
-            let parent2 = randomChoices(parents);
+            let parent1 = randomChoices(parents1);
+            let parent2 = randomChoices(parents1);
             const [child1, child2] = crossover(parent1, parent2);
             offSpring.push(child1);
             offSpring.push(child2);
@@ -230,8 +232,8 @@ const generateExam = async (req, res) => {
         console.log(`Mutation ${generation + 1}`);
 
         // Elitism
-        if (bestSolution) {
-            offSpring[0] = bestSolution;
+        if (bestSolution1) {
+            offSpring[0] = bestSolution1;
         }
         console.log(`Elitism ${generation + 1}`);
 
@@ -241,70 +243,119 @@ const generateExam = async (req, res) => {
             return constraint1(items, p) && constraint2(items, p) && constraint3(p)
         });
         if (feasible_solutions.length > 0) {
-            // const feasible_length = feasible_solutions.map(individual => individual.filter(x => x === 1).length)
-            // console.log(feasible_length)
             const fitnesses1 = feasible_solutions.map(individual => feasibleFitnessFunction(items, individual, theta, b, d));
             const bestIndex1 = fitnesses1.indexOf(Math.min(...fitnesses1));
-            bestSolution = feasible_solutions[bestIndex1];
-            bestFitness = fitnesses1;
+            bestSolution1 = feasible_solutions[bestIndex1];
+            bestFitness1 = fitnesses1;
         };
     }
-    console.log(bestSolution.filter(x => x === 1).length)
-    console.log(bestFitness)
-    console.log(bestSolution.forEach((p, index) => {
-        if(p === 1){
-            console.log(index)
-            console.log(items[index])
-            // return items[index];
-        }
-    }))
-
-
-
-    //找第一個最佳解: 以下開始迴圈做演化，每一圈代表演化了一代
-    // for (let generation = 0; generation < numGenerations; generation++) {
-    //     // console.log(generation);
-    //     // Evaluate: 計算適應度
-    //     const fitnesses = population.map(individual => fitnessFunction(items, individual, theta, b, d));
-
-    //     // 新的族群
-    //     const newPopulation = [];
-    //     while (newPopulation.length < popSize) {
-    //         // Select: 選擇出適應度可能為最佳的父/母
-    //         const parent1 = select(population, fitnesses);
-    //         const parent2 = select(population, fitnesses);
-    //         // Crossover: 把選出的父母交配產生子代
-    //         const [child1, child2] = crossover(parent1, parent2);
-    //         // Mutation: 做突變
-    //         const mutateChild1 = mutate(child1, mutationRate);
-    //         const mutateChild2 = mutate(child2, mutationRate);
-    //         if (constraint3(mutateChild1)) {
-    //             newPopulation.push(mutateChild1);
-    //         }
-    //         if (constraint3(mutateChild2)) {
-    //             newPopulation.push(mutateChild2);
-    //         }
-    //     }
-    //     // 更新族群
-    //     population = newPopulation;
-    // }
-
-    // // 找到第一個最佳解
-    // const fitnesses1 = population.map(individual => feasibleFitnessFunction(items, individual, theta, b, d));
-    // const bestIndex1 = fitnesses1.indexOf(Math.min(...fitnesses1));
-    // const bestSolution1 = population[bestIndex1];
-
-    // console.log(bestSolution1)
-    // console.log(population[bestIndex1 % items.length].forEach((p, index) => {
-    //     if(p === 1){
+    // console.log(bestSolution1.filter(x => x === 1).length)
+    // console.log(bestFitness1)
+    // console.log(bestSolution1.forEach((p, index) => {
+    //     if (p === 1) {
     //         console.log(index)
     //         console.log(items[index])
-    //         // return items[index];
     //     }
     // }))
-    // console.log(Math.min(...fitnesses1))
 
-    res.status(200).json(items)
+    // 記錄第一個最佳解的索引
+    let firstBestIndices = bestSolution1.map((value, index) => value === 1 ? index : -1).filter(index => index !== -1);
+
+    // ----------第二個最佳解---------- //
+    // Initialize
+    let population2 = initializationPopulation(popSize, chromosomeLength, onesCount);
+    let bestSolution2 = null;
+    let bestFitness2 = Number.NEGATIVE_INFINITY;
+
+    //找第一個最佳解: 以下開始迴圈做演化，每一圈代表演化了一代
+    for (let generation = 0; generation < numGenerations; generation++) {
+        // Evaluation
+        // 將先前建立的population陣列的解放入objective_function計算
+        let fitness = population2.map(p => objective_function(items, p, theta, b, d));
+        // 從先前建立的population陣列中挑選出符合constraint1~3的解
+        let feasible_population = population2.filter(p => {
+            constraint1(items, p) && constraint2(items, p) && constraint3(p) && check(firstBestIndices, p)
+        });
+        console.log(`Evaluate ${generation + 1}`);
+
+        // Selection
+        if (feasible_population.length > 0) {
+            // 只計算那些符合constraint1~3的解
+            let feasible_fitness = feasible_population.map(p => objective_function(items, p, theta, b, d));
+            let invert_feasible_fitness = invertWeights(feasible_fitness);
+            parents2 = weightedRandomChoice(feasible_population, invert_feasible_fitness, popSize);
+        } else {
+            while (parents2.length < popSize) {
+                let potential_parents = weightedRandomChoice(population2, fitness, 1)[0];
+                if (constraint1(items, potential_parents) && constraint2(items, potential_parents) && constraint3(potential_parents) && check(firstBestIndices, potential_parents)) {
+                    parents2.push(potential_parents);
+                }
+            }
+        }
+        console.log(`Selection ${generation + 1}`);
+
+        // Crossover
+        let offSpring = [];
+        while (offSpring.length < popSize) {
+            let parent1 = randomChoices(parents2);
+            let parent2 = randomChoices(parents2);
+            const [child1, child2] = crossover(parent1, parent2);
+            offSpring.push(child1);
+            offSpring.push(child2);
+        }
+        console.log(`Crossover ${generation + 1}`);
+
+        // Mutation
+        for (let i = 0; i < popSize; i++) {
+            mutate(offSpring[i], mutationRate);
+        }
+        console.log(`Mutation ${generation + 1}`);
+
+        // Elitism
+        if (bestSolution2) {
+            offSpring[0] = bestSolution2;
+        }
+        console.log(`Elitism ${generation + 1}`);
+
+        population2 = offSpring;
+        // Find the best feasible solution
+        let feasible_solutions = population2.filter(p => {
+            return constraint1(items, p) && constraint2(items, p) && constraint3(p)
+        });
+        if (feasible_solutions.length > 0) {
+            const fitnesses2 = feasible_solutions.map(individual => feasibleFitnessFunction(items, individual, theta, b, d));
+            const bestIndex2 = fitnesses2.indexOf(Math.min(...fitnesses2));
+            bestSolution2 = feasible_solutions[bestIndex2];
+            bestFitness2 = fitnesses2;
+        };
+    }
+    // console.log(bestSolution2.filter(x => x === 1).length)
+    // console.log(bestFitness2);
+    // console.log(bestSolution2.forEach((p, index) => {
+    //     if (p === 1) {
+    //         console.log(index)
+    //         console.log(items[index])
+    //     }
+    // }))
+
+    // ----------結果---------- //
+    const indexArr1 = [];
+    bestSolution1.forEach((p, index) => {
+        if (p === 1) {
+            console.log(index)
+            console.log(items[index])
+            indexArr1.push(items[index])
+        }
+    })
+    bestSolution2.forEach((p, index) => {
+        if (p === 1) {
+            console.log(index)
+            console.log(items[index])
+            indexArr1.push(items[index])
+        }
+    })
+
+    res.status(200).json(indexArr1)
 }
 
 export { generateExam };
@@ -336,4 +387,23 @@ function invertWeights(weights) {
 function randomChoices(parents) {
     let randomNum = Math.floor(Math.random() * (parents.length));
     return parents[randomNum];
+}
+
+// Check
+// function check(firstBestIndices, X_i) {
+//     // 確保不選擇第一個最佳解中的題目
+//     firstBestIndices.forEach(index => {
+//         console.log(X_i[index]);
+//         if (X_i[index] === 0) return true;
+//         else return false;
+//     });
+// }
+function check(firstBestIndices, X_i) {
+    let allValid = true;
+    firstBestIndices.forEach(index => {
+        if (X_i[index] !== 0) {
+            allValid = false;
+        }
+    });
+    return allValid;
 }
