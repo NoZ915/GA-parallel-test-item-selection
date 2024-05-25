@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer";
 import { Fab, Box, Chip, CircularProgress } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import Skeleton from "../components/Skeleton";
-import { fetchItems } from "../utils/fetchItems";
+import { fetchItems } from "../utils/http";
 
 const containerStyle = {
     display: "flex",

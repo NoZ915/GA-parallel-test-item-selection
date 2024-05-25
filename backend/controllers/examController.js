@@ -1,4 +1,6 @@
-import Item from "../models/itemModal.js";
+import mongoose from "mongoose";
+import Item from "../models/itemModel.js";
+import Exam from "../models/examModel.js";
 
 // ----------求目標函數---------- //
 // theta: 等級能力值（由等級1~5）
@@ -169,7 +171,49 @@ function mutate(chromosome, mutationRate) {
     return chromosome;
 }
 
-// 主要程式碼
+// 其他funtcion
+// 1. 按權重隨機選擇
+function weightedRandomChoice(population, weights, k) {
+    let choices = [];
+    let totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
+
+    for (let i = 0; i < k; i++) {
+        let rand = Math.random() * totalWeight;
+        for (let j = 0; j < population.length; j++) {
+            if (rand < weights[j]) {
+                choices.push(population[j]);
+                break;
+            }
+            rand -= weights[j];
+        }
+    }
+    return choices;
+}
+// 2. 權重越大，影響力越小
+function invertWeights(weights) {
+    const maxWeight = Math.max(...weights);
+    return weights.map(weight => maxWeight - weight + 1);
+}
+// Select
+function randomChoices(parents) {
+    let randomNum = Math.floor(Math.random() * (parents.length));
+    return parents[randomNum];
+}
+
+// Check
+function check(firstBestIndices, X_i) {
+    // 確保不選擇第一個最佳解中的題目
+    let allValid = true;
+    firstBestIndices.forEach(index => {
+        if (X_i[index] !== 0) {
+            allValid = false;
+        }
+    });
+    return allValid;
+}
+
+// ----------主要程式碼----------- //
+// POST: 利用基因演算法建立測驗並存至DB
 const generateExam = async (req, res) => {
     const items = await Item.find({}).sort({ createdAt: -1 });
     const popSize = 1000; // 族群大小
@@ -339,71 +383,66 @@ const generateExam = async (req, res) => {
     // }))
 
     // ----------結果---------- //
-    const indexArr1 = [];
+    const idArr = [];
     bestSolution1.forEach((p, index) => {
         if (p === 1) {
             console.log(index)
-            console.log(items[index])
-            indexArr1.push(items[index])
+            console.log(items[index]._id)
+            idArr.push(items[index]._id)
         }
     })
     bestSolution2.forEach((p, index) => {
         if (p === 1) {
             console.log(index)
-            console.log(items[index])
-            indexArr1.push(items[index])
+            console.log(items[index]._id)
+            idArr.push(items[index]._id)
         }
     })
 
-    res.status(200).json(indexArr1)
-}
-
-export { generateExam };
-
-// 其他funtcion
-// 1. 按權重隨機選擇
-function weightedRandomChoice(population, weights, k) {
-    let choices = [];
-    let totalWeight = weights.reduce((acc, weight) => acc + weight, 0);
-
-    for (let i = 0; i < k; i++) {
-        let rand = Math.random() * totalWeight;
-        for (let j = 0; j < population.length; j++) {
-            if (rand < weights[j]) {
-                choices.push(population[j]);
-                break;
-            }
-            rand -= weights[j];
-        }
+    try {
+        const exam = await Exam.create({ idArr });
+        res.status(200).json(exam);
+    } catch {
+        res.status(400).json({ error: error.message });
     }
-    return choices;
-}
-// 2. 權重越大，影響力越小
-function invertWeights(weights) {
-    const maxWeight = Math.max(...weights);
-    return weights.map(weight => maxWeight - weight + 1);
-}
-// Select
-function randomChoices(parents) {
-    let randomNum = Math.floor(Math.random() * (parents.length));
-    return parents[randomNum];
 }
 
-// Check
-// function check(firstBestIndices, X_i) {
-//     // 確保不選擇第一個最佳解中的題目
-//     firstBestIndices.forEach(index => {
-//         console.log(X_i[index]);
-//         if (X_i[index] === 0) return true;
-//         else return false;
-//     });
-// }
-function check(firstBestIndices, X_i) {
-    let allValid = true;
-    firstBestIndices.forEach(index => {
-        if (X_i[index] !== 0) {
-            allValid = false;
-        }
-    });
-    return allValid;
+// GET: 取得所有測驗
+const getExams = async (req, res) => {
+    const exams = await Exam.find({}).sort({ createdAt: -1 });
+    res.status(200).json(exams);
 }
+
+// GET: 取得單一測驗的內容
+const getExam = async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: "No such exam" });
+    }
+
+    try {
+        // 查找測驗
+        const exam = await Exam.findById(id);
+        if (!exam) {
+            return res.status(404).json({ error: "No such exam" });
+        }
+
+        // 查找相關的項目
+        const itemsArr = [];
+        for (const i of exam.idArr) {
+            const item = await Item.findById(i);
+            if (item) {
+                itemsArr.push(item);
+            }
+        }
+
+        // 返回結果
+        res.status(200).json(itemsArr);
+    } catch (error) {
+        // 處理錯誤
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+export { generateExam, getExams, getExam };

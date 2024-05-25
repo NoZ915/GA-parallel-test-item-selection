@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import Item from "../models/itemModal.js";
+import Item from "../models/itemModel.js";
 import { error } from "console";
 
 const router = express.Router();
