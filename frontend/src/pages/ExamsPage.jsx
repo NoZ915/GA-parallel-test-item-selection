@@ -45,7 +45,6 @@ function ExamsPage() {
             queryClient.invalidateQueries("exams");
         }
     })
-
     function handleClick() {
         mutate();
     }
