@@ -60,7 +60,7 @@ function ExamPage() {
                     return (
                         <Box key={item._id}>
                             <Typography># {item.year}-{item.examPaper}</Typography>
-                            <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`http://localhost:4000/${item.content}`} alt={item.examPaper} />
+                            <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`https://ga-exam-item-selection-backend.zeabur.app/${item.content}`} alt={item.examPaper} />
                         </Box>
                     )
                 })}
@@ -77,7 +77,7 @@ function ExamPage() {
                     return (
                         <Box key={item._id}>
                             <Typography># {item.year}-{item.examPaper}</Typography>
-                            <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`http://localhost:4000/${item.content}`} alt={item.examPaper} />
+                            <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`https://ga-exam-item-selection-backend.zeabur.app/${item.content}`} alt={item.examPaper} />
                         </Box>
                     )
                 })}

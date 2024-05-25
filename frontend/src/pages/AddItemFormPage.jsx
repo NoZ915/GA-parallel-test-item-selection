@@ -72,7 +72,7 @@ function AddItemFormPage() {
         formData.append("type", type);
         formData.append("examPaper", examPaper);
 
-        axios.post("http://localhost:4000/api/items", formData)
+        axios.post("https://ga-exam-item-selection-backend.zeabur.app/api/items", formData)
             .then(res => {
                 setFile("");
                 setYear("111");

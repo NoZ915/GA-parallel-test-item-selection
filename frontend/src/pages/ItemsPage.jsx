@@ -52,7 +52,7 @@ function ItemsPage() {
                             {page.data.map(item => {
                                 return (
                                     <Box sx={{ ...containerStyle }} key={item._id}>
-                                        <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`http://localhost:4000/${item.content}`} alt={item.examPaper} />
+                                        <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`https://ga-exam-item-selection-backend.zeabur.app/${item.content}`} alt={item.examPaper} />
                                         <Box sx={{ fontSize: "20px" }}>
                                             <Chip sx={{ mr: "3px" }} label={item.year} varient="outlined" />
                                             <Chip sx={{ mr: "3px" }} label={item.examPaper} varient="outlined" />
