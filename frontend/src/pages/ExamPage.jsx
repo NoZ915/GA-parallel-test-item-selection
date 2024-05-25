@@ -70,7 +70,7 @@ function ExamPage() {
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Box sx={{ ...examTitleStyle }}>
                 <Typography variant="h4" sx={{ mb: 2 }}>第一份試卷</Typography>
-                <Box sx={{ display: "flex", mb: 2 }}>
+                <Box sx={{ display: "flex", mb: 2, flexWrap: "wrap", justifyContent: "center" }}>
                     {Object.entries(firstDifficultyCounts).map(([difficulty, count]) => (
                         <Box key={difficulty} sx={{ display: "flex", mr: 4 }}>
                             <Rating name="read-only" value={difficulty} readOnly />
@@ -100,7 +100,7 @@ function ExamPage() {
 
             <Box sx={{ ...examTitleStyle }}>
                 <Typography variant="h4" sx={{ mb: 2 }}>第二份試卷</Typography>
-                <Box sx={{ display: "flex", mb: 2 }}>
+                <Box sx={{ display: "flex", mb: 2, flexWrap: "wrap", justifyContent: "center" }}>
                     {Object.entries(secondDifficultyCounts).map(([difficulty, count]) => (
                         <Box key={difficulty} sx={{ display: "flex", mr: 4 }}>
                             <Rating name="read-only" value={difficulty} readOnly />
