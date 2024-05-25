@@ -91,7 +91,7 @@ function ExamPage() {
                 {firstExam.map(item => {
                     return (
                         <Box key={item._id} sx={{ ml: 4, mt: 4 }}>
-                            <Typography># {item.year}-{item.examPaper}</Typography>
+                            <Typography># {item.year}-{item.examPaper}-{item.format}-{item.type}</Typography>
                             <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`https://ga-exam-item-selection-backend.zeabur.app/${item.content}`} alt={item.examPaper} />
                         </Box>
                     )
@@ -121,7 +121,7 @@ function ExamPage() {
                 {secondExam.map(item => {
                     return (
                         <Box key={item._id} sx={{ ml: 4, mt: 4 }}>
-                            <Typography># {item.year}-{item.examPaper}</Typography>
+                            <Typography># {item.year}-{item.examPaper}-{item.format}-{item.type}</Typography>
                             <img style={{ marginBottom: "8px", maxWidth: "600px", width: "80%", height: "100%", objectFit: "contain" }} src={`https://ga-exam-item-selection-backend.zeabur.app/${item.content}`} alt={item.examPaper} />
                         </Box>
                     )
