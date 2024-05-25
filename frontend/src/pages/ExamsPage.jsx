@@ -54,21 +54,29 @@ function ExamsPage() {
         <>
             <Box sx={{ display: "flex", justifyContent: "center" }}>
                 {isPending ? (
-                    <LoadingButton
-                        sx={{ border: "1px solid white", color: "white", mb: 4 }}
-                        variant="contained"
-                        loading={true}
-                    >
-                        建立測驗
-                    </LoadingButton>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <LoadingButton
+                            sx={{ border: "1px solid white", color: "white", mb: 2 }}
+                            variant="contained"
+                            loading={true}
+                        >
+                            建立測驗
+                        </LoadingButton>
+                        <Typography sx={{ color: "white", mb: 4 }}>建立測驗中，請稍候</Typography>
+                    </Box>
+
                 ) : (
-                    <Button
-                        sx={{ border: "1px solid white", color: "white", mb: 4 }}
-                        variant="contained"
-                        onClick={handleClick}
-                    >
-                        建立測驗
-                    </Button>
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Button
+                            sx={{ border: "1px solid white", color: "white", mb: 2 }}
+                            variant="contained"
+                            onClick={handleClick}
+                        >
+                            建立測驗
+                        </Button>
+                        <Typography sx={{ color: "white", mb: 4 }}>點擊按鈕，產生新測驗</Typography>
+                    </Box>
+
                 )
                 }
             </Box>
@@ -88,8 +96,8 @@ function ExamsPage() {
                                             <Box sx={{ ...containerStyle }} key={item._id}>
                                                 <Typography>測驗試題編號：{item._id}</Typography>
                                                 <Typography>建立時間：{new Date(item.updatedAt).toLocaleString("zh-tw")}</Typography>
-                                                <Button 
-                                                    variant="contained" 
+                                                <Button
+                                                    variant="contained"
                                                     sx={{ color: "white" }}
                                                 >
                                                     <Link style={{ color: "white", textDecoration: "none" }} to={`/exams/${item._id}`}>進入測驗</Link>

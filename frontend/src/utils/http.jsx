@@ -18,10 +18,10 @@ export async function fetchItems({ pageParam }) {
     }
 }
 
-export async function generateExam(){
-    try{
+export async function generateExam() {
+    try {
         await axios.post("http://localhost:4000/api/exams/generateExam")
-    }catch(error){
+    } catch (error) {
         return error;
     }
 }
@@ -42,7 +42,6 @@ export async function fetchExams({ pageParam }) {
 export async function fetchExam(examId) {
     try {
         const res = await axios.get(`http://localhost:4000/api/exams/getExam/${examId}`);
-        console.log(res)
         return res.data
     } catch (error) {
         return error;
