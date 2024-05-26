@@ -27,10 +27,15 @@ function ExamPage() {
         refetchOnWindowFocus: false
     })
 
-    const componentRef = useRef();
-    const handleClick = useReactToPrint({
-        content: () => componentRef.current,
-        documentTitle: `exams`
+    const test1Ref = useRef();
+    const test2Ref = useRef();
+    const handleTest1Print = useReactToPrint({
+        content: () => test1Ref.current,
+        documentTitle: `exams1`
+    })
+    const handleTest2Print = useReactToPrint({
+        content: () => test2Ref.current,
+        documentTitle: `exams2`
     })
 
     const firstExam = data?.slice(0, 20);
@@ -82,13 +87,13 @@ function ExamPage() {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={handleClick}
+                    onClick={handleTest1Print}
                 >
                     <Typography>下載測驗</Typography>
                     <DownloadTwoToneIcon />
                 </Button>
             </Box>
-            <Box sx={{ backgroundColor: "white", width: "80%", mb: 4 }} ref={componentRef}>
+            <Box sx={{ backgroundColor: "white", width: "80%", mb: 4 }} ref={test1Ref}>
                 {firstExam.map(item => {
                     return (
                         <Box key={item._id} sx={{ ml: 4, mt: 4 }}>
@@ -112,13 +117,13 @@ function ExamPage() {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    onClick={handleClick}
+                    onClick={handleTest2Print}
                 >
                     <Typography>下載測驗</Typography>
                     <DownloadTwoToneIcon />
                 </Button>
             </Box>
-            <Box sx={{ backgroundColor: "white", width: "80%", mb: 4 }}>
+            <Box sx={{ backgroundColor: "white", width: "80%", mb: 4 }} ref={test2Ref}>
                 {secondExam.map(item => {
                     return (
                         <Box key={item._id} sx={{ ml: 4, mt: 4 }}>

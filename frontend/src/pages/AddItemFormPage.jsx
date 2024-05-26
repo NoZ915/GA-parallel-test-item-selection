@@ -199,6 +199,7 @@ function AddItemFormPage() {
                     sx={{ display: "block", margin: "auto", color: "white" }}
                     type="submit"
                     variant="contained"
+                    disabled
                 >
                     建立題目
                 </Button>
