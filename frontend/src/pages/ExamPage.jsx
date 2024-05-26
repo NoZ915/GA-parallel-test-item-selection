@@ -23,7 +23,8 @@ function ExamPage() {
         queryKey: ["exam"],
         queryFn: () => fetchExam(examId),
         enabled: !!examId, // 只有在有 examId 時才執行查詢
-        initialData: []
+        initialData: [],
+        refetchOnWindowFocus: false
     })
 
     const componentRef = useRef();
